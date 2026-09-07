@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: geroncio-postgres
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-geroncio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-geroncio_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-geroncio}
+    volumes:
+      - geroncio_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-geroncio} -d ${POSTGRES_DB:-geroncio}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  geroncio_pgdata:
