@@ -114,6 +114,9 @@ pnpm dev
 # iniciar o DB (Postgres)
 pnpm db
 
+# iniciar o Backend inteiro (DB + Serviços)
+pnpm backend:docker
+
 # iniciar o Prisma Studio
 pnpm studio
 ```
