@@ -23,6 +23,7 @@ enum StatusPedido {
 enum TipoFuncionario {
   PROPRIETARIO
   ENTREGADOR
+  CAIXA
 }
 
 model Restaurante {
@@ -36,8 +37,8 @@ model Restaurante {
   endereco    String
   credenciais CredencialPlataforma[]
   vinculos    VinculoFuncionario[]
-  veiculos    Veiculo[]
-  estoques    Estoque[]
+  // veiculos    Veiculo[]
+  estoque     EstoqueProduto[]
 }
 
 model CredencialPlataforma {
@@ -59,7 +60,7 @@ model Funcionario {
   tipo             TipoFuncionario      @default(ENTREGADOR)
   status           StatusEntregador?
   vinculos         VinculoFuncionario[]
-  veiculos         Veiculo[]
+  // veiculos         Veiculo[]
   entregas         Entrega[]
 }
 
@@ -73,25 +74,25 @@ model VinculoFuncionario {
   funcionario   Funcionario @relation(fields: [funcionarioId], references: [id], onDelete: Cascade)
 }
 
-model Veiculo {
-  id            Int          @id @default(autoincrement())
-  modelo        String
-  marca         String
-  placa         String       @unique
-  restauranteId Int?         @map("restaurante_id")
-  funcionarioId Int?         @map("funcionario_id")
-  restaurante   Restaurante? @relation(fields: [restauranteId], references: [id])
-  funcionario   Funcionario? @relation(fields: [funcionarioId], references: [id])
-}
+// model Veiculo {
+//   id            Int          @id @default(autoincrement())
+//   modelo        String
+//   marca         String
+//   placa         String       @unique
+//   restauranteId Int?         @map("restaurante_id")
+//   funcionarioId Int?         @map("funcionario_id")
+//   restaurante   Restaurante? @relation(fields: [restauranteId], references: [id])
+//   funcionario   Funcionario? @relation(fields: [funcionarioId], references: [id])
+// }
 
-model Estoque {
-  id            Int              @id @default(autoincrement())
-  endereco      String
-  cep           String
-  restauranteId Int              @map("restaurante_id")
-  restaurante   Restaurante      @relation(fields: [restauranteId], references: [id], onDelete: Cascade)
-  produtos      EstoqueProduto[]
-}
+// model Estoque {
+//   id            Int              @id @default(autoincrement())
+  // endereco      String
+  // cep           String
+//   restauranteId Int              @map("restaurante_id")
+//   restaurante   Restaurante      @relation(fields: [restauranteId], references: [id], onDelete: Cascade)
+//   produtos      EstoqueProduto[]
+// }
 
 model Produto {
   id          Int               @id @default(autoincrement())
@@ -105,11 +106,13 @@ model Produto {
 
 model EstoqueProduto {
   id         Int     @id @default(autoincrement())
-  estoqueId  Int     @map("estoque_id")
+  // estoqueId  Int     @map("estoque_id")
+  restauranteId Int @map("restaurante_id")
   produtoId  Int     @map("produto_id")
   quantidade Int
-  estoque    Estoque @relation(fields: [estoqueId], references: [id], onDelete: Cascade)
+  // estoque    Estoque @relation(fields: [estoqueId], references: [id], onDelete: Cascade)
   produto    Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  restaurante Restaurante @relation(fields: [restauranteId], references: [id], onDelete: Cascade)
 }
 
 model MapeamentoApp {
@@ -132,7 +135,9 @@ model EstoqueSyncLog {
 
 model Pedido {
   id              Int          @id @default(autoincrement())
-  nomeCliente     String       @map("nome_cliente")
+  // nomeCliente     String       @map("nome_cliente")
+  clienteId       Int?         @map("cliente_id")
+  cliente         Cliente?     @relation(fields: [clienteId], references: [id])
   preco           Decimal      @db.Decimal(10, 2)
   metodoPagamento String       @map("metodo_pagamento")
   app             String
@@ -143,6 +148,17 @@ model Pedido {
   status          StatusPedido @default(em_preparo)
   itens           ItemPedido[]
   entrega         Entrega?
+}
+
+model Cliente{
+  id              Int         @id @default(autoincrement())
+  nomeCliente     String      @map("nome_cliente")
+  endereco        String      
+  telefone        String?
+  email           String?
+  pedidos         Pedido[]
+  cpf             String?     @unique
+  criadoEm        DateTime    @default(now()) @map("criado_em")
 }
 
 model ItemPedido {
