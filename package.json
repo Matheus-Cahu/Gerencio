@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "cd frontend && npx expo start"
+    "dev": "cd frontend && npx expo start",
+    "db": "cd backend && docker compose up -d",
+    "studio": "cd backend && pnpm prisma studio"
   },
   "keywords": [],
   "author": "",
